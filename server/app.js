@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const Auth = require('./middleware/auth');
 const models = require('./models');
 
+
 const app = express();
 
 app.set('views', `${__dirname}/views`);
@@ -78,6 +79,37 @@ app.post('/links',
 // Write your authentication routes here
 /************************************************************/
 
+app.post('/signup', (req, res) => {
+  models.Users.create({username: req.body.username, password: req.body.password})
+    .then(response => {
+      res.status(201).redirect('/');
+    })
+    .error( (err) => {
+      if (err.code.includes('DUP')) {
+        res.status(400).redirect('/signup');
+      } else {
+        res.send(err);
+      }
+    });
+});
+
+app.post('/login', (req, res) => {
+  models.Users.get({username: req.body.username})
+    .then(response => {
+
+      if (response) {
+        var attemptedPassword = req.body.password;
+        var actualPassword = response.password;
+        if (models.Users.compare(attemptedPassword, actualPassword, response.salt)) {
+          res.status(200).redirect('/');
+        } else {
+          res.status(404).redirect('/login');
+        }
+      } else {
+        res.redirect('/login');
+      }
+    });
+});
 
 
 /************************************************************/
