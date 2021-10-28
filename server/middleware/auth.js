@@ -1,6 +1,7 @@
 const models = require('../models');
 const Promise = require('bluebird');
 
+// work for last two tests goes here
 module.exports.createSession = (req, res, next) => {
   Promise.resolve(req.cookies.shortlyid)
     .then((hash) => {
