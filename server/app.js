@@ -45,7 +45,7 @@ app.get('/links', Auth.verifySession,
 
   });
 
-app.post('/links',
+app.post('/links', Auth.verifySession,
   (req, res, next) => {
     var url = req.body.url;
     if (!models.Links.isValidUrl(url)) {
@@ -86,6 +86,9 @@ app.post('/links',
 /************************************************************/
 
 app.post('/signup', (req, res) => {
+  if (req.body.password.length < 3) {
+    res.redirect('/signup');
+  }
   models.Users.create({username: req.body.username, password: req.body.password})
     .then(newUser => {
       models.Sessions.update({id: req.session.id}, {userId: newUser.insertId});

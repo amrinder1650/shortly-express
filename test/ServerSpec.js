@@ -104,6 +104,44 @@ describe('', function() {
       });
     });
 
+    // ===== ADDITIONAL TEST 1 =====
+
+    it('password length should be at least 3', function(done) {
+      var newUser = {
+        username: 'Howard',
+        password: 'p@'
+      };
+      db.query('INSERT INTO users SET ?', newUser, function(err, results) {
+        var sameUser = newUser;
+        db.query('INSERT INTO users SET ?', sameUser, function(err) {
+          expect(err).to.exist;
+          expect(sameUser.password.length > 2).to.equal(false);
+          done();
+        });
+      });
+    });
+
+    // ===========================
+
+    // ===== ADDITIONAL TEST 2 =====
+
+    it('username must have @ symbol', function(done) {
+      var newUser = {
+        username: 'Howard',
+        password: 'p@ssw0rd!'
+      };
+      db.query('INSERT INTO users SET ?', newUser, function(err, results) {
+        var sameUser = newUser;
+        db.query('INSERT INTO users SET ?', sameUser, function(err) {
+          expect(err).to.exist;
+          expect(sameUser.username.includes('@')).to.equal(false);
+          done();
+        });
+      });
+    });
+
+    // ===========================
+
     it('should increment the id of new rows', function(done) {
       var newUser = {
         username: 'Howard',
@@ -598,7 +636,20 @@ describe('', function() {
         done();
       });
     });
+
+    // ===== ADDITIONAL TEST 3 =====
+
+    it('Redirects to login page if a user tries to post the links and is not signed in', function(done) {
+      request('http://127.0.0.1:4568/links', function(error, res, body) {
+        if (error) { return done(error); }
+        expect(res.req.path).to.not.equal('/');
+        done();
+      });
+    });
+
+    // ===========================
   });
+
 
   describe('Link creation:', function() {
 
