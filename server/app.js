@@ -84,6 +84,9 @@ app.post('/links',
 
 app.post('/signup', (req, res) => {
   models.Users.create({username: req.body.username, password: req.body.password})
+    .then(newUser => {
+      models.Sessions.update({id: req.session.id}, {userId: newUser.insertId});
+    })
     .then(response => {
       res.status(201).redirect('/');
     })
@@ -104,6 +107,7 @@ app.post('/login', (req, res) => {
         var attemptedPassword = req.body.password;
         var actualPassword = response.password;
         if (models.Users.compare(attemptedPassword, actualPassword, response.salt)) {
+
           res.status(200).redirect('/');
         } else {
           res.status(404).redirect('/login');
@@ -112,6 +116,13 @@ app.post('/login', (req, res) => {
 
         res.redirect('/login');
       }
+    });
+});
+
+app.get('/logout', (req, res, next) => {
+  models.Sessions.delete({hash: req.session.hash})
+    .then(() => {
+      res.status(200).redirect('/');
     });
 });
 
