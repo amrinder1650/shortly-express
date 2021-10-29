@@ -21,18 +21,20 @@ app.use(Auth.createSession);
 
 
 
-app.get('/',
+
+app.get('/', Auth.verifySession,
   (req, res) => {
     res.render('index');
   });
 
-app.get('/create',
+app.get('/create', Auth.verifySession,
   (req, res) => {
     res.render('index');
   });
 
-app.get('/links',
+app.get('/links', Auth.verifySession,
   (req, res, next) => {
+
     models.Links.getAll()
       .then(links => {
         res.status(200).send(links);
@@ -40,6 +42,7 @@ app.get('/links',
       .error(error => {
         res.status(500).send(error);
       });
+
   });
 
 app.post('/links',
@@ -119,12 +122,20 @@ app.post('/login', (req, res) => {
     });
 });
 
+app.get('/login',
+  (req, res) => {
+    res.render('login');
+  });
+
 app.get('/logout', (req, res, next) => {
   models.Sessions.delete({hash: req.session.hash})
     .then(() => {
-      res.status(200).redirect('/');
+      res.status(200).redirect('/login');
     });
 });
+
+
+
 
 
 /************************************************************/

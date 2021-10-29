@@ -15,7 +15,7 @@ module.exports.createSession = (req, res, next) => {
       if (Object.keys(session).length === 0) {
         throw session;
       } else {
-        console.log('SESSION ', session);
+        // console.log('SESSION ', session);
 
         // req.session = session;
         // res.cookie('shortlyid', req.session.hash);
@@ -55,3 +55,13 @@ module.exports.createSession = (req, res, next) => {
 // Add additional authentication middleware functions below
 /************************************************************/
 
+module.exports.verifySession = function(req, res, next) {
+
+  if (models.Sessions.isLoggedIn(req.session)) {
+    console.log('NEXT');
+    next();
+  } else {
+    console.log('LOGIN REDIRECT');
+    res.redirect('/login');
+  }
+};
